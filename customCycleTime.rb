@@ -10,6 +10,7 @@ require 'pp'
 require 'dotenv'
 Dotenv.load
 
+
 class Numeric
   def duration
     secs  = self.to_int
@@ -98,9 +99,17 @@ class CycleTimeForAcceptedStories
         select {|story_info| story_info.has_key?('accepted_at')}.
         map do |story_info|
           story_info['cycle_time'] = Time.parse(story_info['accepted_at']) - Time.parse(story_info['started_at'])
+          # story_info['biz_cycles_time'] = story_info['started_at'].business_time_until(story_info['accepted_at'])
+
           story_info['dev_time'] = Time.parse(story_info['finished_at']) - Time.parse(story_info['started_at'])
+          # story_info['biz_dev_time'] = story_info['started_at'].business_time_until(story_info['finished_at'])
+
           story_info['qa_time'] = Time.parse(story_info['delivered_at']) - Time.parse(story_info['finished_at'])
+          # story_info['biz_qa_time'] = story_info['finished_at'].business_time_until(story_info['delivered_at'])
+
           story_info['client_time'] = Time.parse(story_info['accepted_at']) - Time.parse(story_info['delivered_at'])
+          # story_info['biz_client_time'] = story_info['delivered_at'].business_time_until(story_info['accepted_at'])
+          
           story_info
         end
 
