@@ -3,7 +3,8 @@
     - add dotenv gem
     - add env file
     - load dotenv (use script)
-
+    - bundle install
+    - gem install bundler
 
 # api_examples
 
