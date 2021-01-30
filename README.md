@@ -1,5 +1,6 @@
 # my notes
     - make sure you're running own version of ruby on mac
+        - ruby v3 doesn't work!
     - add dotenv gem
     - add env file
     - load dotenv (use script)
