@@ -5,6 +5,8 @@ require 'multi_json'
 require 'yaml'
 require 'time'
 
+require 'pp'
+
 require 'dotenv'
 Dotenv.load
 
@@ -35,9 +37,6 @@ class CycleTimeForAcceptedStories
   @@token = ENV['TOKEN'] || 'TestToken'
   @@project_id = ENV['PROJECT_ID'] || '101'
 
-  puts @@project_id
-  puts @@token
-
   def run
     stories = {}
     offset = 0
@@ -58,8 +57,13 @@ class CycleTimeForAcceptedStories
             stories[story_id] ||= {}
             stories[story_id]['id'] ||= story_id
 
+            # puts change_info['new_values'].inspect
             if change_info['new_values']['current_state'] == 'started'
               stories[story_id]['started_at'] = activity['occurred_at']
+            elsif change_info['new_values']['current_state'] == 'finished'
+              stories[story_id]['finished_at'] = activity['occurred_at']
+            elsif change_info['new_values']['current_state'] == 'delivered'
+              stories[story_id]['delivered_at'] = activity['occurred_at']
             elsif stories[story_id]['accepted_at'].nil? && change_info['new_values']['current_state'] == 'accepted'
               stories[story_id]['accepted_at'] = activity['occurred_at']
             else
@@ -71,11 +75,10 @@ class CycleTimeForAcceptedStories
           end
         end
       end
-
       offset += activity_with_envelope['pagination']['limit']
     end while total > offset
     STDERR.puts ""
-
+    
     # look up name and type for ech story
     stories.keys.each_slice(100) do |story_ids|
       search_results = get("projects/#{@@project_id}/search", "query=id:#{story_ids.join(',')}%20includedone:true")
@@ -84,21 +87,31 @@ class CycleTimeForAcceptedStories
         # stories[story_hash['id']]['story_type'] = story_name['story_type']
       end
     end
-
-    # drop stories where we can't compute cycle time (including all releases), and compute it for the ones left
-    stories = stories.values.
+    # drop stories where we can't compute cycle time (including all releases), and compute it for the ones left       
+        stories = stories.values.
         # select {|story_info| story_info['story_type'] != 'release'}.
-        select {|story_info| story_info.has_key?('started_at') && story_info.has_key?('accepted_at') }.
+
+        # original
+        # select {|story_info| story_info.has_key?('started_at') && story_info.has_key?('accepted_at') }.
+
+        # custom
+        select {|story_info| story_info.has_key?('accepted_at')}.
         map do |story_info|
           story_info['cycle_time'] = Time.parse(story_info['accepted_at']) - Time.parse(story_info['started_at'])
+          story_info['dev_time'] = Time.parse(story_info['finished_at']) - Time.parse(story_info['started_at'])
+          story_info['qa_time'] = Time.parse(story_info['delivered_at']) - Time.parse(story_info['finished_at'])
+          story_info['client_time'] = Time.parse(story_info['accepted_at']) - Time.parse(story_info['delivered_at'])
           story_info
         end
 
+
+    # puts MultiJson.dump(stories)
+    # pp(stories)
     stories.
         sort_by { |story_info| story_info['cycle_time'] }.
         each do |story_info|
           name =  story_info['name'] || '*deleted*'
-          puts sprintf("%12d:  cycle time was %-25.25s rejected count %-2d (%.40s#{name.length > 40 ? '...' : ''})", story_info['id'], story_info['cycle_time'].duration, story_info['rejected_count'].to_i, name)
+          pp(story_info)
         end
   end
 
