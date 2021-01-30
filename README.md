@@ -1,3 +1,10 @@
+# my notes
+    - make sure you're running own version of ruby on mac
+    - add dotenv gem
+    - add env file
+    - load dotenv (use script)
+
+
 # api_examples
 
 This repository contains example scripts showing how to use Tracker's API to get information not readily available via the Tracker application.
