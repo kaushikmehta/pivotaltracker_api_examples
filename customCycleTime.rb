@@ -4,6 +4,9 @@ require 'net/https'
 require 'multi_json'
 require 'yaml'
 require 'time'
+require 'active_support'
+require 'business_time'
+require 'business_seconds'
 
 require 'pp'
 
@@ -99,28 +102,27 @@ class CycleTimeForAcceptedStories
         select {|story_info| story_info.has_key?('accepted_at')}.
         map do |story_info|
           story_info['cycle_time'] = Time.parse(story_info['accepted_at']) - Time.parse(story_info['started_at'])
-          # story_info['biz_cycles_time'] = story_info['started_at'].business_time_until(story_info['accepted_at'])
+          story_info['biz_cycle_time'] = Time.parse(story_info['started_at']).business_time_until(Time.parse(story_info['accepted_at']))
 
           story_info['dev_time'] = Time.parse(story_info['finished_at']) - Time.parse(story_info['started_at'])
-          # story_info['biz_dev_time'] = story_info['started_at'].business_time_until(story_info['finished_at'])
+          story_info['biz_dev_time'] = Time.parse(story_info['started_at']).business_time_until(Time.parse(story_info['finished_at']))
 
           story_info['qa_time'] = Time.parse(story_info['delivered_at']) - Time.parse(story_info['finished_at'])
-          # story_info['biz_qa_time'] = story_info['finished_at'].business_time_until(story_info['delivered_at'])
+          story_info['biz_qa_time'] = Time.parse(story_info['finished_at']).business_time_until(Time.parse(story_info['delivered_at']))
 
           story_info['client_time'] = Time.parse(story_info['accepted_at']) - Time.parse(story_info['delivered_at'])
-          # story_info['biz_client_time'] = story_info['delivered_at'].business_time_until(story_info['accepted_at'])
+          story_info['biz_client_time'] = Time.parse(story_info['delivered_at']).business_time_until(Time.parse(story_info['accepted_at']))
           
           story_info
         end
 
 
     # puts MultiJson.dump(stories)
-    # pp(stories)
     stories.
         sort_by { |story_info| story_info['cycle_time'] }.
         each do |story_info|
           name =  story_info['name'] || '*deleted*'
-          pp(story_info)
+          puts MultiJson.dump(story_info)
         end
   end
 
