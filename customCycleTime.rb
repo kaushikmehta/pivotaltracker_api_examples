@@ -8,7 +8,8 @@ require 'active_support'
 require 'business_time'
 require 'business_seconds'
 
-require 'pp'
+#awesome_print
+require 'ap'
 
 require 'dotenv'
 Dotenv.load
@@ -62,14 +63,14 @@ class CycleTimeForAcceptedStories
             stories[story_id]['id'] ||= story_id
 
             # puts change_info['new_values'].inspect
-            if change_info['new_values']['current_state'] == 'started'
-              stories[story_id]['started_at'] = activity['occurred_at']
+            if stories[story_id]['accepted_at'].nil? && change_info['new_values']['current_state'] == 'accepted'
+              stories[story_id]['accepted_at'] = activity['occurred_at']
             elsif change_info['new_values']['current_state'] == 'finished'
               stories[story_id]['finished_at'] = activity['occurred_at']
             elsif change_info['new_values']['current_state'] == 'delivered'
               stories[story_id]['delivered_at'] = activity['occurred_at']
-            elsif stories[story_id]['accepted_at'].nil? && change_info['new_values']['current_state'] == 'accepted'
-              stories[story_id]['accepted_at'] = activity['occurred_at']
+            elsif change_info['new_values']['current_state'] == 'started'
+              stories[story_id]['started_at'] = activity['occurred_at']
             else
               if change_info['new_values']['current_state'] == 'rejected'
                 stories[story_id]['rejected_count'] ||= 0
@@ -122,7 +123,7 @@ class CycleTimeForAcceptedStories
         sort_by { |story_info| story_info['cycle_time'] }.
         each do |story_info|
           name =  story_info['name'] || '*deleted*'
-          puts MultiJson.dump(story_info)
+          ap(story_info)
         end
   end
 
