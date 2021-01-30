@@ -1,11 +1,21 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    date (3.1.0)
+    dotenv (2.7.6)
+    multi_json (1.15.0)
+    time (0.1.0)
+      date
+    yaml (0.1.1)
 
 PLATFORMS
   x86_64-darwin-19
 
 DEPENDENCIES
+  dotenv
+  multi_json
+  time
+  yaml
 
 BUNDLED WITH
    2.2.7

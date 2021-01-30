@@ -5,6 +5,10 @@ require 'multi_json'
 require 'yaml'
 require 'time'
 
+require 'dotenv'
+Dotenv.load
+
+
 class Numeric
   def duration
     secs  = self.to_int

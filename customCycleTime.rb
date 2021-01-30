@@ -5,6 +5,9 @@ require 'multi_json'
 require 'yaml'
 require 'time'
 
+require 'dotenv'
+Dotenv.load
+
 class Numeric
   def duration
     secs  = self.to_int
@@ -31,6 +34,9 @@ class CycleTimeForAcceptedStories
     'https://www.pivotaltracker.com'
   @@token = ENV['TOKEN'] || 'TestToken'
   @@project_id = ENV['PROJECT_ID'] || '101'
+
+  puts @@project_id
+  puts @@token
 
   def run
     stories = {}
