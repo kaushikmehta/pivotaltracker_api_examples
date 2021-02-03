@@ -123,7 +123,10 @@ class CycleTimeForAcceptedStories
         sort_by { |story_info| story_info['cycle_time'] }.
         each do |story_info|
           name =  story_info['name'] || '*deleted*'
-          ap(story_info)
+          if name === 'Test - Walkthrough with Kaushik' || name === 'Another Sample - Walkthrough w/ Corey' then
+            ap(story_info)
+          end
+          
         end
   end
 
